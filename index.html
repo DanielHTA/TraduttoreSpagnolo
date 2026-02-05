@@ -1,79 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Spanish Translator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 30px;
-    }
-    textarea, select, button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    .box {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoTutor AI - Multilenguaje</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); }
+    </style>
 </head>
-<body>
+<body class="bg-[#f0f4f8] text-slate-900 min-h-screen p-4 md:p-12">
 
-  <div class="box">
-    <h2>Spanish Translator 🇪🇸</h2>
+    <div id="loginOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+            <h2 class="text-2xl font-extrabold mb-6 text-center">Configuración de Acceso</h2>
+            <input type="password" id="apiKeyInput" placeholder="Pega tu API Key de Google" 
+                   class="w-full p-4 bg-slate-100 border-none rounded-2xl mb-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+            <button onclick="unlock()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all">
+                Activar Gemini 3 Flash
+            </button>
+        </div>
+    </div>
 
-    <label>Text in Spanish:</label>
-    <textarea id="inputText" rows="4" placeholder="Escribe algo en español..."></textarea>
+    <div class="max-w-4xl mx-auto opacity-0 transition-opacity duration-500" id="mainApp">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">LingoTutor <span class="text-indigo-600 italic">Global</span></h1>
+                <p class="text-slate-500 text-sm font-semibold">Fase de Prototipado: v5.0 (Multi-Lang)</p>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
+                <span class="text-xs font-bold text-slate-400 ml-2 uppercase">Aprender en:</span>
+                <select id="langSelect" class="bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold text-indigo-600 outline-none focus:ring-2 focus:ring-indigo-200 cursor-pointer">
+                    <option value="Español">Español 🇪🇸</option>
+                    <option value="English">English 🇺🇸</option>
+                    <option value="Français">Français 🇫🇷</option>
+                    <option value="Deutsch">Deutsch 🇩🇪</option>
+                    <option value="Italiano">Italiano 🇮🇹</option>
+                    <option value="Português">Português 🇧🇷</option>
+                    <option value="日本語 (Japonés)">日本語 🇯🇵</option>
+                </select>
+            </div>
+        </header>
 
-    <label>Translate to:</label>
-    <select id="targetLang">
-      <option value="en">English</option>
-      <option value="fr">French</option>
-      <option value="de">German</option>
-      <option value="it">Italian</option>
-      <option value="pt">Portuguese</option>
-      <option value="ru">Russian</option>
-      <option value="ja">Japanese</option>
-      <option value="zh">Chinese</option>
-    </select>
+        <section class="space-y-6">
+            <div class="bg-white p-2 rounded-[2.5rem] shadow-xl flex flex-col md:flex-row gap-2">
+                <input type="text" id="userInput" placeholder="Escribe lo que quieras aprender..." 
+                       class="flex-1 p-6 bg-transparent rounded-3xl outline-none text-lg">
+                <button onclick="ask()" id="askBtn"
+                        class="bg-indigo-600 text-white px-10 py-4 rounded-[2rem] font-bold hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100">
+                    Consultar
+                </button>
+            </div>
 
-    <button onclick="translateText()">Translate</button>
+            <div id="loading" class="hidden flex flex-col items-center py-12">
+                <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-slate-400 font-bold text-xs tracking-widest uppercase">Analizando con Gemini 3 Flash Preview...</p>
+            </div>
 
-    <label>Translation:</label>
-    <textarea id="outputText" rows="4" readonly></textarea>
-  </div>
+            <div id="result" class="hidden">
+                <div class="glass-panel rounded-[2.5rem] p-8 md:p-12 shadow-2xl animate-fade-in">
+                    <div id="content" class="text-slate-800 prose prose-indigo max-w-none">
+                        </div>
+                    <hr class="my-8 border-slate-200/50">
+                    <div class="flex justify-between items-center">
+                        <button onclick="copyResult()" class="text-xs font-bold text-indigo-500 hover:text-indigo-700 uppercase tracking-tight">Copiar explicación</button>
+                        <button onclick="lock()" class="text-xs font-bold text-slate-300 hover:text-red-400 uppercase tracking-tight">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 
-  <script>
-    async function translateText() {
-      const text = document.getElementById("inputText").value;
-      const target = document.getElementById("targetLang").value;
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
 
-      if (!text.trim()) return;
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
 
-      const response = await fetch("https://libretranslate.de/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          q: text,
-          source: "es",
-          target: target,
-          format: "text"
-        })
-      });
+        window.unlock = () => {
+            const key = document.getElementById('apiKeyInput').value;
+            if (key.length < 15) return alert("API Key no válida");
+            sessionStorage.setItem('G3_KEY', key);
+            checkAuth();
+        };
 
-      const data = await response.json();
-      document.getElementById("outputText").value = data.translatedText;
-    }
-  </script>
+        window.lock = () => {
+            sessionStorage.removeItem('G3_KEY');
+            location.reload();
+        };
 
+        function checkAuth() {
+            if (sessionStorage.getItem('G3_KEY')) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainApp').classList.remove('opacity-0');
+            }
+        }
+        checkAuth();
+
+        window.ask = async () => {
+            const key = sessionStorage.getItem('G3_KEY');
+            const input = document.getElementById('userInput').value;
+            const targetLang = document.getElementById('langSelect').value;
+            const content = document.getElementById('content');
+            const resultDiv = document.getElementById('result');
+            const loading = document.getElementById('loading');
+
+            if (!input) return;
+
+            loading.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+
+            try {
+                const genAI = new GoogleGenerativeAI(key);
+                const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+                const prompt = `Eres un tutor lingüístico políglota de élite. 
+                El usuario quiere aprender sobre: "${input}".
+                Tu objetivo es explicar todo de forma magistral en el idioma: ${targetLang}.
+                
+                Instrucciones de respuesta:
+                1. 📝 Proporciona la traducción y el significado principal.
+                2. 🔬 Desglose gramatical: Explica por qué se construye así la frase.
+                3. 🎭 Matices: Explica si suena natural, anticuado, formal o callejero.
+                4. 💡 Comparación: Si hay una expresión equivalente en ${targetLang}, menciónala.
+                5. 🚀 3 ejemplos prácticos en situaciones distintas.
+                
+                Usa HTML (<b>, <i>, <ul>, <br>) para un formato profesional y limpio.`;
+
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                
+                // Formateo de respuesta
+                content.innerHTML = response.text()
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                    .replace(/### (.*?)/g, '<h3 class="text-xl font-bold mt-4 mb-2 text-indigo-700">$1</h3>');
+
+                resultDiv.classList.remove('hidden');
+            } catch (e) {
+                alert("Error de conexión o API Key inválida. Inténtalo de nuevo.");
+            } finally {
+                loading.classList.add('hidden');
+            }
+        };
+
+        window.copyResult = () => {
+            const text = document.getElementById('content').innerText;
+            navigator.clipboard.writeText(text);
+            alert("¡Copiado al portapapeles!");
+        };
+    </script>
 </body>
 </html>
