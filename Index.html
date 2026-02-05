@@ -2,44 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Simple Spanish Translator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Language Translator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      width: 90%;
       max-width: 600px;
       margin: 2rem auto;
       padding: 1rem;
     }
-    textarea, button {
+    textarea, select, button {
       width: 100%;
       margin-top: 0.5rem;
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-size: 1rem;
     }
     #output {
       margin-top: 1rem;
-      padding: 0.5rem;
-      background: #f1f1f1;
+      padding: 0.6rem;
+      background: #f8f8f8;
       min-height: 100px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
 
-  <h1>Spanish Translator 🔤</h1>
-  <p>Type text in Spanish below and click “Translate”.</p>
-  
+  <h1>Translator 🌍</h1>
+  <p>Translate Spanish text into your chosen language.</p>
+
   <textarea id="inputText" rows="5" placeholder="Escribe texto en español..."></textarea>
-  <button id="translateBtn">Translate to English</button>
-  
-  <div id="output">Translation will appear here...</div>
+
+  <label for="langSelect">Translate to:</label>
+  <select id="langSelect">
+    <option value="English">English</option>
+    <option value="Italian">Italian</option>
+    <option value="French">French</option>
+    <option value="German">German</option>
+    <option value="Portuguese">Portuguese</option>
+    <option value="Chinese">Chinese</option>
+    <option value="Japanese">Japanese</option>
+    <option value="Arabic">Arabic</option>
+  </select>
+
+  <button id="translateBtn">Translate</button>
+
+  <div id="output">Your translation will appear here…</div>
 
   <script>
-    const apiKey = "AIzaSyAXfgeMbMMqFAEcJSrK_3IHcpSskdZdafI"; // your provided key
+    const apiKey = "AIzaSyAXfgeMbMMqFAEcJSrK_3IHcpSskdZdafI"; // your API key
 
     async function translateText() {
       const text = document.getElementById("inputText").value.trim();
+      const targetLang = document.getElementById("langSelect").value;
+
       if (!text) {
         alert("Please enter some Spanish text first!");
         return;
@@ -49,19 +67,17 @@
 
       try {
         const response = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey),
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+            encodeURIComponent(apiKey),
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              // Prompt tells the model what to do
               "contents": [
                 {
                   "parts": [
                     {
-                      "text": `Translate the following Spanish text into English:\n\n${text}`
+                      "text": `Translate the following Spanish text into ${targetLang}:\n\n${text}`
                     }
                   ]
                 }
@@ -72,17 +88,14 @@
         );
 
         const data = await response.json();
+
         if (!response.ok) {
-          // API error
           console.error(data);
-          document.getElementById("output").textContent = "Error: " + (data.error?.message ?? "Unknown error");
+          document.getElementById("output").textContent = "Error: " + (data.error?.message ?? "Unknown");
           return;
         }
 
-        // Extract generated text
-        const translated = data?.[ "outputs"] 
-          ? data.outputs.map(o => o.text).join("\n")
-          : JSON.stringify(data);
+        const translated = data?.outputs ? data.outputs.map(o => o.text).join("\n") : JSON.stringify(data);
 
         document.getElementById("output").textContent = translated;
 
