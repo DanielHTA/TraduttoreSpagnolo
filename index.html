@@ -117,7 +117,6 @@
         </main>
 
         <footer class="mt-20 text-center pb-12">
-            <p class="text-stone-400 text-xs font-bold tracking-widest uppercase italic">Hecho con ❤️ para el aprendizaje inteligente • 2026</p>
         </footer>
     </div>
 
@@ -167,7 +166,7 @@
 
             try {
                 const genAI = new GoogleGenerativeAI(key);
-                const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
                 const prompt = `Actúa como un tutor lingüístico experto con una personalidad cálida y pedagógica.
                 Analiza la expresión: "${input}". 
