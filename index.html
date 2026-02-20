@@ -1,129 +1,150 @@
 <!DOCTYPE html>
+<html lang="en">
 <html lang="es">
 <head>
+  <meta charset="UTF-8">
+  <title>Spanish Translator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+    textarea, select, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+    }
+  </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LingoTutor G3 </title>
+    <title>LingoTutor AI - Multilenguaje</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap');
-        
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background-color: #fdf6f0;
-            background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-        }
-
-        .rosa-mexicano { color: #E4007C; }
-        .bg-rosa-mexicano { background-color: #E4007C; }
-        
-        .mexican-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 8px solid #E4007C;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
-        }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, #E4007C 0%, #FF5A5F 100%);
-            transition: all 0.3s ease;
-        }
-
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(228, 0, 124, 0.3);
-        }
-
-        /* Estilización del contenido generado por la IA */
-        #content h1 { font-size: 1.5rem; font-weight: 900; color: #E4007C; margin-bottom: 1rem; border-left: 4px solid #E4007C; padding-left: 10px; }
-        #content p { margin-bottom: 1rem; line-height: 1.6; }
-        #content ul { list-style-type: none; padding-left: 0; }
-        #content li { background: #fff5f9; margin-bottom: 0.5rem; padding: 10px; border-radius: 12px; border-left: 3px solid #FF5A5F; }
-        #content strong { color: #312e81; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body>
 
-    <div id="loginOverlay" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl border-t-8 border-rosa-mexicano">
-            <div class="text-center mb-6">
-                <span class="text-5xl">🌵</span>
-                <h2 class="text-3xl font-black mt-4 text-stone-800">¡Bienvenidos!</h2>
-                <p class="text-gray-500">Ingresa tu llave de Google AI Studio para activar al tutor.</p>
-            </div>
-            <input type="password" id="apiKeyInput" placeholder="Pega tu API Key aquí" 
-                   class="w-full p-4 bg-gray-100 border-none rounded-2xl mb-4 outline-none focus:ring-4 focus:ring-pink-200 text-center font-mono">
-            <button onclick="unlock()" class="w-full btn-gradient text-white font-black py-4 rounded-2xl tracking-widest uppercase shadow-lg">
-                Iniciar Sesión
+  <div class="box">
+    <h2>Spanish Translator 🇪🇸</h2>
+
+    <label>Text in Spanish:</label>
+    <textarea id="inputText" rows="4" placeholder="Escribe algo en español..."></textarea>
+
+    <label>Translate to:</label>
+    <select id="targetLang">
+      <option value="en">English</option>
+      <option value="fr">French</option>
+      <option value="de">German</option>
+      <option value="it">Italian</option>
+      <option value="pt">Portuguese</option>
+      <option value="ru">Russian</option>
+      <option value="ja">Japanese</option>
+      <option value="zh">Chinese</option>
+    </select>
+
+    <button onclick="translateText()">Translate</button>
+
+    <label>Translation:</label>
+    <textarea id="outputText" rows="4" readonly></textarea>
+  </div>
+
+  <script>
+    async function translateText() {
+      const text = document.getElementById("inputText").value;
+      const target = document.getElementById("targetLang").value;
+
+      if (!text.trim()) return;
+
+      const response = await fetch("https://libretranslate.de/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          q: text,
+          source: "es",
+          target: target,
+          format: "text"
+        })
+      });
+
+      const data = await response.json();
+      document.getElementById("outputText").value = data.translatedText;
+    }
+  </script>
+<body class="bg-[#f0f4f8] text-slate-900 min-h-screen p-4 md:p-12">
+
+    <div id="loginOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+            <h2 class="text-2xl font-extrabold mb-6 text-center">Configuración de Acceso</h2>
+            <input type="password" id="apiKeyInput" placeholder="Pega tu API Key de Google" 
+                   class="w-full p-4 bg-slate-100 border-none rounded-2xl mb-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+            <button onclick="unlock()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all">
+                Activar Gemini 3 Flash
             </button>
-            <p class="text-[10px] text-center mt-4 text-gray-400 uppercase tracking-widest font-bold">Prototipo v5.0 • 2026</p>
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto opacity-0 transition-opacity duration-700" id="mainApp">
-        
-        <header class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div class="border-l-8 border-rosa-mexicano pl-6">
-                <h1 class="text-5xl font-black tracking-tighter text-stone-800">LINGO<span class="rosa-mexicano">TUTOR</span></h1>
-                <p class="text-stone-500 font-bold uppercase tracking-widest text-xs">Inteligencia Artificial • Gemini </p>
+    <div class="max-w-4xl mx-auto opacity-0 transition-opacity duration-500" id="mainApp">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">LingoTutor <span class="text-indigo-600 italic">Global</span></h1>
+                <p class="text-slate-500 text-sm font-semibold">Fase de Prototipado: v5.0 (Multi-Lang)</p>
             </div>
-
-            <div class="flex flex-wrap gap-3 items-center">
-                <button onclick="lock()" class="bg-white p-3 px-5 rounded-2xl shadow-sm border border-stone-200 hover:bg-red-50 transition-all group">
-                    <span class="text-xs font-black text-stone-400 group-hover:text-red-600 uppercase">🔑 Cambiar Key</span>
-                </button>
-
-                <div class="flex items-center bg-white p-3 rounded-2xl shadow-sm border border-stone-200">
-                    <span class="text-xs font-black text-stone-400 px-2 uppercase tracking-tighter">Aprender en:</span>
-                    <select id="langSelect" class="bg-stone-100 border-none rounded-xl px-4 py-1 font-bold text-stone-700 outline-none focus:ring-2 focus:ring-pink-500 cursor-pointer">
-                        <option value="Español (México)">Español 🇲🇽</option>
-                        <option value="English (US)">English 🇺🇸</option>
-                        <option value="Français">Français 🇫🇷</option>
-                        <option value="Deutsch">Deutsch 🇩🇪</option>
-                        <option value="Italiano">Italiano 🇮🇹</option>
-                        <option value="Português">Português 🇧🇷</option>
-                        <option value="日本語">日本語 🇯🇵</option>
-                        <option value="한국어">한국어 🇰🇷</option>
-                        <option value="Náhuatl">Náhuatl 🇲🇽</option>
-                    </select>
-                </div>
+            
+            <div class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
+                <span class="text-xs font-bold text-slate-400 ml-2 uppercase">Aprender en:</span>
+                <select id="langSelect" class="bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold text-indigo-600 outline-none focus:ring-2 focus:ring-indigo-200 cursor-pointer">
+                    <option value="Español">Español 🇪🇸</option>
+                    <option value="English">English 🇺🇸</option>
+                    <option value="Français">Français 🇫🇷</option>
+                    <option value="Deutsch">Deutsch 🇩🇪</option>
+                    <option value="Italiano">Italiano 🇮🇹</option>
+                    <option value="Português">Português 🇧🇷</option>
+                    <option value="日本語 (Japonés)">日本語 🇯🇵</option>
+                </select>
             </div>
         </header>
 
-        <main class="grid gap-8">
-            <div class="mexican-card p-4">
-                <div class="flex flex-col md:flex-row gap-3">
-                    <input type="text" id="userInput" placeholder="Escribe una frase, modismo o palabra..." 
-                           class="flex-1 p-6 text-xl font-medium bg-transparent outline-none placeholder:text-stone-300">
-                    <button onclick="ask()" class="btn-gradient text-white px-12 py-5 rounded-2xl font-black text-lg shadow-lg uppercase tracking-tight">
-                        Consultar
-                    </button>
-                </div>
+        <section class="space-y-6">
+            <div class="bg-white p-2 rounded-[2.5rem] shadow-xl flex flex-col md:flex-row gap-2">
+                <input type="text" id="userInput" placeholder="Escribe lo que quieras aprender..." 
+                       class="flex-1 p-6 bg-transparent rounded-3xl outline-none text-lg">
+                <button onclick="ask()" id="askBtn"
+                        class="bg-indigo-600 text-white px-10 py-4 rounded-[2rem] font-bold hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-100">
+                    Consultar
+                </button>
             </div>
 
-            <div id="loading" class="hidden text-center py-20">
-                <div class="inline-block animate-spin text-5xl mb-4">⚙️</div>
-                <p class="rosa-mexicano font-black tracking-widest animate-pulse uppercase text-sm">El tutor está preparando tu lección...</p>
+            <div id="loading" class="hidden flex flex-col items-center py-12">
+                <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-slate-400 font-bold text-xs tracking-widest uppercase">Analizando con Gemini 3 Flash Preview...</p>
             </div>
 
-            <div id="result" class="hidden animate-in fade-in zoom-in duration-500">
-                <div class="mexican-card p-8 md:p-12 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-pink-100 opacity-20 rounded-bl-full"></div>
-                    
-                    <div id="content" class="text-stone-700 prose prose-stone max-w-none">
+            <div id="result" class="hidden">
+                <div class="glass-panel rounded-[2.5rem] p-8 md:p-12 shadow-2xl animate-fade-in">
+                    <div id="content" class="text-slate-800 prose prose-indigo max-w-none">
                         </div>
-
-                    <div class="mt-12 pt-8 border-t border-stone-100 flex flex-wrap gap-4 justify-between items-center">
-                        <div class="flex gap-4">
-                            <button onclick="copyResult()" class="text-sm font-black rosa-mexicano hover:opacity-70 uppercase tracking-tighter">Copiar texto</button>
-                            <button onclick="window.print()" class="text-sm font-black text-stone-400 hover:text-stone-800 uppercase tracking-tighter">Guardar PDF</button>
-                        </div>
-                        <span class="text-[10px] font-black text-stone-300 uppercase italic">Powered by Google Gemini 2026</span>
+                    <hr class="my-8 border-slate-200/50">
+                    <div class="flex justify-between items-center">
+                        <button onclick="copyResult()" class="text-xs font-bold text-indigo-500 hover:text-indigo-700 uppercase tracking-tight">Copiar explicación</button>
+                        <button onclick="lock()" class="text-xs font-bold text-slate-300 hover:text-red-400 uppercase tracking-tight">Cerrar Sesión</button>
                     </div>
                 </div>
             </div>
-        </main>
+        </section>
     </div>
 
     <script type="importmap">
@@ -137,30 +158,29 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // Función para entrar
         window.unlock = () => {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (key.length < 10) return alert("Por favor, ingresa una Key válida.");
-            sessionStorage.setItem('MEX_G3_KEY', key);
-            location.reload(); // Recargamos para aplicar cambios
+            const key = document.getElementById('apiKeyInput').value;
+            if (key.length < 15) return alert("API Key no válida");
+            sessionStorage.setItem('G3_KEY', key);
+            checkAuth();
         };
 
-        // Función para salir / cambiar key
         window.lock = () => {
-            sessionStorage.removeItem('MEX_G3_KEY');
+            sessionStorage.removeItem('G3_KEY');
             location.reload();
         };
 
-        // Comprobación de autenticación al cargar
-        if (sessionStorage.getItem('MEX_G3_KEY')) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainApp').classList.replace('opacity-0', 'opacity-100');
+        function checkAuth() {
+            if (sessionStorage.getItem('G3_KEY')) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainApp').classList.remove('opacity-0');
+            }
         }
+        checkAuth();
 
-        // Lógica de consulta a la IA
         window.ask = async () => {
-            const key = sessionStorage.getItem('MEX_G3_KEY');
-            const input = document.getElementById('userInput').value.trim();
+            const key = sessionStorage.getItem('G3_KEY');
+            const input = document.getElementById('userInput').value;
             const targetLang = document.getElementById('langSelect').value;
             const content = document.getElementById('content');
             const resultDiv = document.getElementById('result');
@@ -173,42 +193,33 @@
 
             try {
                 const genAI = new GoogleGenerativeAI(key);
-                // Usamos 1.5-flash por ser el más compatible y rápido para prototipos
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
-                const prompt = `Actúa como un tutor lingüístico experto mexicano con mucha chispa y sabiduría.
-                El usuario envió: "${input}". 
-                Explica todo detalladamente en el idioma: ${targetLang}.
+                const prompt = `Eres un tutor lingüístico políglota de élite. 
+                El usuario quiere aprender sobre: "${input}".
+                Tu objetivo es explicar todo de forma magistral en el idioma: ${targetLang}.
                 
-                Usa este formato exactamente (en Markdown):
-                # 🇲🇽 La Idea Principal
-                (Traducción y explicación breve)
+                Instrucciones de respuesta:
+                1. 📝 Proporciona la traducción y el significado principal.
+                2. 🔬 Desglose gramatical: Explica por qué se construye así la frase.
+                3. 🎭 Matices: Explica si suena natural, anticuado, formal o callejero.
+                4. 💡 Comparación: Si hay una expresión equivalente en ${targetLang}, menciónala.
+                5. 🚀 3 ejemplos prácticos en situaciones distintas.
                 
-                # 🧐 Bajo la lupa
-                (Desglose de gramática o vocabulario clave)
-                
-                # 🎭 ¿Cómo suena?
-                (Explicar si es formal, callejero, o profesional)
-                
-                # 🌮 Dato Cultural
-                (Un dato interesante sobre el uso de esta frase o palabra)
-                
-                # 📝 Ponlo en práctica
-                * (Ejemplo 1 con traducción)
-                * (Ejemplo 2 con traducción)
-                * (Ejemplo 3 con traducción)`;
+                Usa HTML (<b>, <i>, <ul>, <br>) para un formato profesional y limpio.`;
 
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
-                const text = response.text();
                 
-                // Convertimos el Markdown de la IA en HTML elegante
-                content.innerHTML = marked.parse(text);
+                // Formateo de respuesta
+                content.innerHTML = response.text()
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                    .replace(/### (.*?)/g, '<h3 class="text-xl font-bold mt-4 mb-2 text-indigo-700">$1</h3>');
+
                 resultDiv.classList.remove('hidden');
-                
             } catch (e) {
-                console.error(e);
-                alert("Hubo un error con la API. Verifica que tu llave sea correcta y que tengas cuota disponible en Google AI Studio.");
+                alert("Error de conexión o API Key inválida. Inténtalo de nuevo.");
             } finally {
                 loading.classList.add('hidden');
             }
@@ -217,7 +228,7 @@
         window.copyResult = () => {
             const text = document.getElementById('content').innerText;
             navigator.clipboard.writeText(text);
-            alert("¡Lección copiada al portapapeles!");
+            alert("¡Copiado al portapapeles!");
         };
     </script>
 </body>
